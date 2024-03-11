@@ -1,9 +1,10 @@
 import { BindingsFactory } from '@comunica/bindings-factory';
 import type { Bindings } from '@comunica/types';
 import type * as RDF from '@rdfjs/types';
+import { Literal, NamedNode, Variable } from '@rdfjs/types';
 import { termToString } from 'rdf-string';
 import { mapTermsNested, someTermsNested } from 'rdf-terms';
-import type { Algebra, Factory } from 'sparqlalgebrajs';
+import { Algebra, Factory } from 'sparqlalgebrajs';
 import { Util } from 'sparqlalgebrajs';
 
 const BF = new BindingsFactory();
@@ -35,8 +36,11 @@ export function materializeTerm(term: RDF.Term, bindings: Bindings): RDF.Term {
 
 /**
  * Materialize the given operation (recursively) with the given bindings.
- * Essentially, all variables in the given operation will be replaced
+ * Essentially, the variables in the given operation
+ * which don't appear in the SELECT clause will be replaced
  * by the terms bound to the variables in the given bindings.
+ * And the variables that appear in the SELECT clause
+ * will be added to a VALUES clause.
  * @param {Operation} operation SPARQL algebra operation.
  * @param {Bindings} bindings A bindings object.
  * @param options Options for materializations.
@@ -132,6 +136,8 @@ export function materializeOperation(
       };
     },
     project(op: Algebra.Project, factory: Factory) {
+      console.log("MATERIALIZING An PROJECT OPERATION");
+      console.log(op);
       // Materialize a project operation.
       // If strictTargetVariables is true, we throw if the project target variable is attempted to be bound.
       // Otherwise, we just filter out the bound variables.
@@ -147,10 +153,28 @@ export function materializeOperation(
         };
       }
 
-      const variables = op.variables.filter(variable => !bindings.has(variable));
+      // TODO Create a values operation with the initialbindings that occur in the select clause
+      let valueVariables : Variable[] = []
+      let valueBindings: Record<string, RDF.Literal | RDF.NamedNode>[] = [];
+
+      for (let variable of op.variables) {
+        if (bindings.has(variable)){
+          const newBinding = { ...bindings.get(variable) };
+          valueVariables.push(variable);
+          valueBindings.push(newBinding);
+        }
+      }
+      let values : Algebra.Operation = factory.createValues(valueVariables, valueBindings);
+      console.log("created values:");
+      console.log(values);
+
+      // TODO old version leaves them out, but instead should put them in a values operation
+      const variables = op.variables.filter(variable => !bindings.has(variable)); //TODO don't leave them out
 
       // Only include projected variables in the sub-bindings that will be passed down recursively.
       // If we don't do this, we may be binding variables that may have the same label, but are not considered equal.
+      // TODO Here we make a subset of only bindings that occur in the SELECT CLAUSE
+      // TODO Will our solution with the Values clause work correctly despite that it concerns the same bindings?
       const subBindings = BF.bindings(<[RDF.Variable, RDF.Term][]> op.variables.map(variable => {
         const binding = bindings.get(variable);
         if (binding) {
@@ -159,17 +183,47 @@ export function materializeOperation(
         // eslint-disable-next-line no-useless-return
         return;
       }).filter(entry => Boolean(entry)));
-
-      return {
-        recurse: false,
-        result: factory.createProject(
-          materializeOperation(
+      
+      console.log("recursion materializeOperation");
+      console.log(materializeOperation(
             op.input,
             subBindings,
             options,
-          ),
+          ));
+
+      console.log("join it with values");
+          console.log(factory.createJoin([values, materializeOperation(
+            op.input,
+            subBindings,
+            options,
+          )]));
+
+      console.log("result to be returned");
+          console.log(factory.createProject(
+            factory.createJoin([values, materializeOperation(
+              op.input,
+              subBindings,
+              options,
+            )]),
+            variables,
+          ));
+
+      return {
+        recurse: false,
+        // result: factory.createJoin([values, factory.createProject( // TODO prev solution
+        //   materializeOperation(
+        //     op.input,
+        //     subBindings,
+        //     options,
+        //   ),
+        result: factory.createProject(
+          factory.createJoin([values, materializeOperation(
+            op.input,
+            subBindings,
+            options,
+          )]),
           variables,
-        ),
+        )
       };
     },
     values(op: Algebra.Values, factory: Factory) {
@@ -248,4 +302,22 @@ export function materializeOperation(
       };
     },
   });
+}
+
+function createValueBindings(bindings: any) : Record<string, RDF.Literal | RDF.NamedNode>[] {
+    return bindings.map((binding : any) => {
+    const newBinding = { ...binding };
+    let valid = true;
+    bindings.forEach((value: RDF.NamedNode, key: RDF.Variable) => {
+      const keyString = termToString(key);
+      if (keyString in newBinding) {
+        if (!value.equals(newBinding[keyString])) {
+          // If the value of the binding is not equal, remove this binding completely from the VALUES clause
+          valid = false;
+        }
+        delete newBinding[keyString];
+      }
+    });
+    return valid ? newBinding : undefined;
+  }).filter(Boolean);
 }

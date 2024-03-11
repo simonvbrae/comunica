@@ -184,7 +184,11 @@ implements IQueryEngine<QueryContext, QueryStringContextInner, QueryAlgebraConte
 
     // Apply initial bindings in context
     if (actionContext.has(KeysInitQuery.initialBindings)) {
+      console.log("Found initialbindings, materializing operation.");
       operation = materializeOperation(operation, actionContext.get(KeysInitQuery.initialBindings)!);
+
+      console.log("Materialized operation result:");
+      console.log(operation);
 
       // Delete the query string from the context, since our initial query might have changed
       actionContext = actionContext.delete(KeysInitQuery.queryString);
@@ -194,6 +198,16 @@ implements IQueryEngine<QueryContext, QueryStringContextInner, QueryAlgebraConte
     const mediatorResult = await this.actorInitQuery.mediatorOptimizeQueryOperation
       .mediate({ context: actionContext, operation });
     operation = mediatorResult.operation;
+    console.log("Operation after optimizing");
+    console.log(operation);
+    console.log("Operation input.input content");
+    for (let i of operation.input.input) {
+        console.log(i);
+    }
+    operation.input.input.splice(2, 1);
+    console.log("Operation after splicing");
+    console.log(operation);
+    
     actionContext = mediatorResult.context || actionContext;
 
     // Print logical query plan
