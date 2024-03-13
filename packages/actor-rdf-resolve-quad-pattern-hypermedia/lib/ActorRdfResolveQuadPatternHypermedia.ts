@@ -14,6 +14,7 @@ import {
   getContextSourceUrl,
   getDataSourceType, hasContextSingleSource,
 } from '@comunica/bus-rdf-resolve-quad-pattern';
+import { KeysInitQuery } from '@comunica/context-entries';
 import type { IActorTest } from '@comunica/core';
 import type { IActionContext } from '@comunica/types';
 import { LRUCache } from 'lru-cache';
@@ -94,8 +95,9 @@ export class ActorRdfResolveQuadPatternHypermedia extends ActorRdfResolveQuadPat
         },
       );
 
+      // If cache is not disabled
       // Set in cache
-      if (this.cache) {
+      if (this.cache && !context.get(KeysInitQuery.disableCaching)) {
         this.cache.set(url, source);
       }
     }

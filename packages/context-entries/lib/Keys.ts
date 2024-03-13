@@ -176,7 +176,8 @@ export const KeysInitQuery = {
   /**
    * A boolean value denoting whether caching is disabled or not.
    */
-  noCache: new ActionContextKey<boolean>('@comunica/actor-init-query:noCache'),
+  noCache: new ActionContextKey<boolean>('@comunica/actor-init-query:noCache'), // TODO Mistakes were made!!
+  disableCaching: new ActionContextKey<boolean>('@comunica/actor-init-query:disableCaching'),
 };
 
 export const KeysQueryOperation = {

@@ -257,8 +257,11 @@ export class CliArgsHandlerBase implements ICliArgsHandler {
     }
 
     // Define if cache should be disabled
-    if (args.noCache) {
+    if (args.noCache) { // TODO mistakes were made!
       context[KeysInitQuery.noCache.name] = true;
+    // Define union default graph
+    if (args.cache === false) {
+      context[KeysInitQuery.disableCaching.name] = true;
     }
   }
 }
