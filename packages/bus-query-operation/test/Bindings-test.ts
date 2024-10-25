@@ -287,10 +287,14 @@ describe('materializeOperation', () => {
       BF,
     ))
       .toEqual(factory.createExtend(
-        factory.createPattern(valueA, termNamedNode, termVariableC, termNamedNode),
+        factory.createJoin([
+          factory.createValues([ termVariableA ], [ valuesBindingsA ]),
+          factory.createPattern(valueA, termNamedNode, termVariableC, termNamedNode),
+        ]),
         termVariableB,
         factory.createTermExpression(valueA),
-      ));
+      )
+    );
   });
 
   it('should error on an extend operation with ' +
