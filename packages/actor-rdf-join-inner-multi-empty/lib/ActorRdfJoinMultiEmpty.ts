@@ -40,6 +40,7 @@ export class ActorRdfJoinMultiEmpty extends ActorRdfJoin {
           cardinality: { type: 'exact', value: 0 },
           canContainUndefs: false,
           variables: ActorRdfJoin.joinVariables(await ActorRdfJoin.getMetadatas(action.entries)),
+          variablesNotDefinedByUser: ActorRdfJoin.joinVariablesNotDefinedByUser(await ActorRdfJoin.getMetadatas(action.entries)),
         }),
         type: 'bindings',
       },

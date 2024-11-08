@@ -241,6 +241,7 @@ export function quadsMetadataToBindingsMetadata(
       })) :
       undefined,
     variables,
+    variablesNotDefinedByUser: variables,
   };
 }
 

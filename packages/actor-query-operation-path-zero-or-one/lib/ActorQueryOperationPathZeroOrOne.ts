@@ -44,6 +44,7 @@ export class ActorQueryOperationPathZeroOrOne extends ActorAbstractPath {
           cardinality: { type: 'exact', value: 1 },
           canContainUndefs: false,
           variables: [],
+          variablesNotDefinedByUser: [],
         }),
       };
     }

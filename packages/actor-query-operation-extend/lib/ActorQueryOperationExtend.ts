@@ -42,7 +42,7 @@ export class ActorQueryOperationExtend extends ActorQueryOperationTypedMediated<
     );
 
     // Throw if the variable has already been bound
-    if ((await output.metadata()).variables.some(innerVariable => innerVariable.equals(variable))) {
+    if ((await output.metadata()).variablesNotDefinedByUser.some(innerVariable => innerVariable.equals(variable))) {
       throw new Error(`Illegal binding to variable '${variable.value}' that has already been bound`);
     }
 

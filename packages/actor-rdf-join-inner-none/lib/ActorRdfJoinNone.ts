@@ -39,6 +39,7 @@ export class ActorRdfJoinNone extends ActorRdfJoin {
           cardinality: { type: 'exact', value: 1 },
           canContainUndefs: false,
           variables: [],
+          variablesNotDefinedByUser: [],
         }),
         type: 'bindings',
       },

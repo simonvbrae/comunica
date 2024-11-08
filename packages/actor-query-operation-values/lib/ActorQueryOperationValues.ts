@@ -43,6 +43,7 @@ export class ActorQueryOperationValues extends ActorQueryOperationTyped<Algebra.
       cardinality: { type: 'exact', value: operation.bindings.length },
       canContainUndefs: operation.bindings.some(bindings => variables.some(variable => !(`?${variable.value}` in bindings))),
       variables,
+      variablesNotDefinedByUser: [],
     });
     return { type: 'bindings', bindingsStream, metadata };
   }

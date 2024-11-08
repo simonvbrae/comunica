@@ -149,6 +149,16 @@ export abstract class ActorRdfJoin
   }
 
   /**
+   * Returns the variables that will occur in the joined bindings that are not user-defined.
+   * @param {MetadataBindings[]} metadatas An array of metadata objects for the entries.
+   * @returns {RDF.Variable[]} An array of joined variables.
+   */
+  public static joinVariablesNotDefinedByUser(metadatas: MetadataBindings[]): RDF.Variable[] {
+    return [ ...new Set(metadatas.flatMap(metadata => metadata.variablesNotDefinedByUser.map(variable => variable.value))) ]
+      .map(variable => DF.variable(variable));
+  }
+
+  /**
    * Returns the result of joining bindings, or `null` if no join is possible.
    * @param {Bindings[]} bindings
    * @returns {Bindings}
@@ -270,6 +280,7 @@ export abstract class ActorRdfJoin
       },
       canContainUndefs: partialMetadata.canContainUndefs ?? metadatas.some(metadata => metadata.canContainUndefs),
       variables: ActorRdfJoin.joinVariables(metadatas),
+      variablesNotDefinedByUser: ActorRdfJoin.joinVariables(metadatas),
     };
   }
 

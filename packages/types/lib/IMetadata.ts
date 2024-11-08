@@ -60,6 +60,11 @@ export type MetadataBindings = IMetadata<RDF.Variable> & {
    * The list of variables for which bindings are provided in the bindings stream.
    */
   variables: RDF.Variable[];
+  /**
+   * The list of variables for which bindings are provided in the bindings stream.
+   * Excluding variables originating from InitialBindings and VALUES operations.
+   */
+  variablesNotDefinedByUser: RDF.Variable[];
 };
 export type MetadataQuads = IMetadata<RDF.QuadTermName>;
 

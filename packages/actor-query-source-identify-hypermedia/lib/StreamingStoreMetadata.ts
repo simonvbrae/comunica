@@ -23,6 +23,7 @@ export class StreamingStoreMetadata extends StreamingStore implements IAggregate
     cardinality: { type: 'exact', value: 0 },
     canContainUndefs: false,
     variables: [],
+    variablesNotDefinedByUser: [],
   };
 
   public constructor(
@@ -116,6 +117,7 @@ export class StreamingStoreMetadata extends StreamingStore implements IAggregate
       },
       canContainUndefs: false,
       variables: [],
+      variablesNotDefinedByUser: [],
     };
 
     this.metadataAccumulator(this.baseMetadata, metadataNew)

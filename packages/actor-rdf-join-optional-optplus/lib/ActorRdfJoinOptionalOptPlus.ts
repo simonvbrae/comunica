@@ -43,6 +43,7 @@ export class ActorRdfJoinOptionalOptPlus extends ActorRdfJoin {
             value: leftMeta.cardinality.value + joinedMeta.cardinality.value,
           },
           state: this.constructState([ leftMeta, joinedMeta ]),
+          variablesNotDefinedByUser: joinedMeta.variablesNotDefinedByUser,
         };
       },
     }};

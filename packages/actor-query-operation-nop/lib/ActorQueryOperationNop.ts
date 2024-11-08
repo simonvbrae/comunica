@@ -34,6 +34,7 @@ export class ActorQueryOperationNop extends ActorQueryOperationTypedMediated<Alg
         cardinality: { type: 'exact', value: 1 },
         canContainUndefs: false,
         variables: [],
+        variablesNotDefinedByUser: [],
       }),
       type: 'bindings',
     };

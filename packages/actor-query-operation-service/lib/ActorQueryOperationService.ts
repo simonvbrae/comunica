@@ -60,6 +60,7 @@ export class ActorQueryOperationService extends ActorQueryOperationTypedMediated
             cardinality: { type: 'exact', value: 1 },
             canContainUndefs: false,
             variables: [],
+            variablesNotDefinedByUser: [],
           }),
         };
         this.logWarn(context, `An error occurred when executing a SERVICE clause: ${(<Error> error).message}`);
